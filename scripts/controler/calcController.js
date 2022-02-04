@@ -1,6 +1,8 @@
 class calcController {
   constructor(){
     this._operation = [];
+    this._lastOperator = '';
+    this._lastNumber = '';
     this._displayCalcEl = document.querySelector('#display');
     this._dateEl = document.querySelector('#data');
     this._timeEl = document.querySelector('#hora');
@@ -27,10 +29,12 @@ class calcController {
 
   clearAll(){
     this._operation = [];
+    this.setLastNumberToDisplay();
   }
 
   clearEntry(){
     this._operation.pop()
+    this.setLastNumberToDisplay();
   }
 
   isOperator(value){
@@ -54,24 +58,61 @@ class calcController {
     }
   }
 
+  getResult(){
+    return eval(this._operation.join("")); 
+  }
+
   calc(){
-    let last = this._operation.pop();
+    let last = ''
+    
+    this._lastOperator = this.getLastItem();
 
-    let result = eval(this._operation.join(""));
+    if (this._operation.length > 3) {
+    
+      last = this._operation.pop();
+      this._lastNumber = this.getResult(); 
+    
+    }
 
-    this._operation = [result, last];
+    if (this._operation.length == 3){
+    
+      this._lastNumber = this.getLastItem(false);
+
+    }
+
+    let result = this.getResult();
+    
+    if (last == '%'){
+      result /= 100;
+      this._operation = [result];
+    } else {
+      
+      
+      this._operation = [result];
+      if (last) this._operation.push(last)
+    }
+    
     this.setLastNumberToDisplay();
   }
 
-  setLastNumberToDisplay(){
-    let lastNumber;
+  getLastItem(isOperator = true){
+    let lastItem;
+
     for (let i = this._operation.length-1 ; i >= 0 ; i--){
-      if(!this.isOperator(this._operation[i])){
-        lastNumber = this._operation[i];
+      if(this.isOperator(this._operation[i]) == isOperator){
+        lastItem = this._operation[i];
         break;
       }
     }
 
+    return lastItem;
+  }
+
+  setLastNumberToDisplay(){
+    
+    let lastNumber = this.getLastItem(false);
+  
+    if (!lastNumber) lastNumber = 0;
     this.displayCalc = lastNumber
   }
 
@@ -120,25 +161,25 @@ class calcController {
         this.clearEntry();
         break;
       case 'soma':
-        this.addOperation('+')
+        this.addOperation('+');
         break;
       case 'subtracao':
-        this.addOperation('-')
+        this.addOperation('-');
         break;
       case 'divisao':
-        this.addOperation('/')
+        this.addOperation('/');
         break;
       case 'multiplicacao':
-        this.addOperation('*')
+        this.addOperation('*');
         break;
       case 'porcento':
-        this.addOperation('%')
+        this.addOperation('%');
         break;
       case 'igual':
-        
+        this.calc();
         break;
       case 'ponto':
-        this.addOperation('.')
+        this.addOperation('.');
         break;
       case '0':
       case '1': 
