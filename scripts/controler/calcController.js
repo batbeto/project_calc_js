@@ -1,6 +1,6 @@
 class calcController {
   constructor(){
-    
+
     this._audioOnOff = false;
     this._audio = new Audio('click.mp3')
     this._operation = [];
@@ -150,8 +150,12 @@ class calcController {
   }
 
   getResult(){
-
-    return eval(this._operation.join("")); 
+    try{
+      return eval(this._operation.join("")); 
+    } catch(e){
+      setTimeout(()=> {this.setError(); },1)
+    }
+    
   }
 
   calc(){
@@ -343,8 +347,12 @@ class calcController {
     return this._displayCalcEl.innerHTML;
   }
 
-  set displayCalc(valor){
-    this._displayCalcEl.innerHTML = valor;
+  set displayCalc(value){
+    if (value.toString().length > 10) {
+      this.setError();
+      return false;
+    }
+    this._displayCalcEl.innerHTML = value;
   }
 
   get displayDate(){
